@@ -35,12 +35,15 @@ public abstract class MenuLogic : MonoBehaviour
     protected int CurrentInfoTab { get => _currentInfoTab; set => _currentInfoTab = value; }
     public static int Difficulty { get => _difficulty; private set => _difficulty = value; }
 
-    protected void AwakeBase() //difficulty op standaardwaarde en settings toggles instellen
+    private RectTransform infoMenuRect;
+
+    protected void AwakeBase() //difficulty op standaardwaarde en settings toggles instellen, en pak RectTransform van de info menu voor animaties
     {
         if (ResetDifficulty)
         {
             Difficulty = 1;
         }
+
         FromScript = true;
         for (int i = 0; i < SettingsToggles.Length; i++)
         {
@@ -50,6 +53,8 @@ public abstract class MenuLogic : MonoBehaviour
             }
         }
         FromScript = false;
+
+        infoMenuRect = InfoMenu.GetComponent<RectTransform>();
     }
 
     public virtual void OpenMenu(int index) //open menu met index
@@ -130,25 +135,27 @@ public abstract class MenuLogic : MonoBehaviour
 
     private void TweenTabs(int enterIndex, int exitIndex, bool forward)
     {
+        float infoMenuWidth = infoMenuRect.rect.width;
+        
         if (forward)
         {
             //verplaatsen inkomende tab (van links naar recht)
-            InfoTabs[enterIndex].transform.localPosition = new Vector3(1420, InfoTabs[enterIndex].transform.localPosition.y, InfoTabs[enterIndex].transform.localPosition.z);
+            InfoTabs[enterIndex].transform.localPosition = new Vector3(infoMenuWidth, InfoTabs[enterIndex].transform.localPosition.y, InfoTabs[enterIndex].transform.localPosition.z);
             LeanTween.moveLocalX(InfoTabs[enterIndex], 0f, 1);
 
             //verplaatsen weggaande tab (van links naar rechts)
             InfoTabs[exitIndex].transform.localPosition = new Vector3(0, InfoTabs[exitIndex].transform.localPosition.y, InfoTabs[exitIndex].transform.localPosition.z);
-            LeanTween.moveLocalX(InfoTabs[exitIndex], -1420f, 1);
+            LeanTween.moveLocalX(InfoTabs[exitIndex], -infoMenuWidth, 1);
         }
         else
         {
             //verplaatsen inkomende tab (van rechts naar links)
-            InfoTabs[enterIndex].transform.localPosition = new Vector3(-1420, InfoTabs[enterIndex].transform.localPosition.y, InfoTabs[enterIndex].transform.localPosition.z);
+            InfoTabs[enterIndex].transform.localPosition = new Vector3(-infoMenuWidth, InfoTabs[enterIndex].transform.localPosition.y, InfoTabs[enterIndex].transform.localPosition.z);
             LeanTween.moveLocalX(InfoTabs[enterIndex], 0f, 1);
 
             //verplaatsen weggaande tab (van rechts naar links)
             InfoTabs[exitIndex].transform.localPosition = new Vector3(0, InfoTabs[exitIndex].transform.localPosition.y, InfoTabs[exitIndex].transform.localPosition.z);
-            LeanTween.moveLocalX(InfoTabs[exitIndex], 1420f, 1);
+            LeanTween.moveLocalX(InfoTabs[exitIndex], infoMenuWidth, 1);
         }
     }
 
