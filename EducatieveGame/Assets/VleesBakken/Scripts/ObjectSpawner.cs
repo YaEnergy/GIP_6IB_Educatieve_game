@@ -50,28 +50,26 @@ public class ObjectSpawner : MonoBehaviour
         switch (gridSize)
         {
             case 1:
-                SetGridProperties(2, 4, 4, 6);
+                SetGridProperties(2, 4, 4);
                 break;
             case 2:
-                SetGridProperties(2, 5, 5, 7.5f);
+                SetGridProperties(2, 5, 5);
                 break;
             case 3:
-                SetGridProperties(1, 6, 6, 4.5f);
+                SetGridProperties(1, 6, 6);
                 break;
             case 4:
-                SetGridProperties(1, 7, 7, 5.25f);
+                SetGridProperties(1, 7, 7);
                 break;
             default:
-                SetGridProperties(1, 8, 8, 6);
+                SetGridProperties(1, 8, 8);
                 break;
         }
 
-        void SetGridProperties(int cellSize, int width, int height, float orthographicSize)
+        void SetGridProperties(int cellSize, int width, int height)
         {
             GridGen.GenerateGrid(width, height, cellSize);
             GridPoints = GridFunc.CenterGridPoints(cellSize);
-            Camera.main.orthographicSize = orthographicSize;
-            GrillBackground.transform.localScale = new(orthographicSize / 2f, orthographicSize / 2f, 1);
         }
 
         GridCells = new GameObject[transform.childCount];
@@ -85,8 +83,9 @@ public class ObjectSpawner : MonoBehaviour
         LastDecreaseTime = Time.time;
     }
 
-    private void Update() //vlees spawnen op de barbecue
+    private void Update()
     {
+        //tijd
         TimeLeft -= Time.deltaTime;
         if (TimeLeft < 0 )
         {
@@ -94,6 +93,16 @@ public class ObjectSpawner : MonoBehaviour
         }
         TimerText.text = Mathf.Round(TimeLeft) + "s";
 
+        //aanpassen camera grootte voor beeldverhouding
+        //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met grootte 7 en beeldverhouding van 16:9 altijd in past
+        float standardAspectRatio = 16.0f / 9.0f;
+        float currentCameraWidth = (float)Camera.main.pixelWidth;
+        float standardCameraWidth = (float)Camera.main.pixelHeight * standardAspectRatio;
+        //maak de camera niet kleiner, dan past de standaard hoogte niet meer
+        float aspectMultiplier = Math.Max(standardCameraWidth / currentCameraWidth, 1.0f);
+        Camera.main.orthographicSize = 7.0f * aspectMultiplier;
+
+        //vlees spawnen op de barbecue
         if (Time.time - LastSpawnTime > (6 - Difficulty) / SpawnRate && GameActive)
         {
             //lijst lege gridpunten aanmaken

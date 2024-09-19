@@ -2721,7 +2721,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Hoeveel vlees komt er op de barbecue?
+  m_text: Hoe groot is de barbecue?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 069500a4bdcadff49836f4a14299139e, type: 2}
   m_sharedMaterial: {fileID: -1579612380258712571, guid: 069500a4bdcadff49836f4a14299139e, type: 2}
@@ -2748,7 +2748,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 28.3
+  m_fontSize: 39
   m_fontSizeBase: 26
   m_fontWeight: 400
   m_enableAutoSizing: 1
