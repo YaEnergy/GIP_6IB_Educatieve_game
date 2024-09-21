@@ -9,7 +9,7 @@ public class ObjectSpawner : MonoBehaviour
     [SerializeField] private GameObject _meat; //de prefab voor een vlees object
     [SerializeField] private float _minutesUntilFastest; //hoeveel minuten tot de snelste spawnrate
     [SerializeField] private Stats _statsObj; //script stats
-    [SerializeField] private GameObject _grillBackground;
+    [SerializeField] private SpriteRenderer _grassBackground;
     [SerializeField] private TextMeshProUGUI _timerText;
     private GameObject[] _gridCells; //lijst met de gridcellen
     private GridGenerator _gridGen; //de gridgenerator
@@ -28,7 +28,7 @@ public class ObjectSpawner : MonoBehaviour
     private GridGenerator GridGen { get => _gridGen; set => _gridGen = value; }
     private GridFunctions GridFunc { get => _gridFunc; set => _gridFunc = value; }
     private Stats StatsObj { get => _statsObj; set => _statsObj = value; }
-    private GameObject GrillBackground { get => _grillBackground; set => _grillBackground = value; }
+    private SpriteRenderer GrassBackground { get => _grassBackground; set => _grassBackground = value; }
     private TextMeshProUGUI TimerText { get => _timerText; set => _timerText = value; }
     private Vector3[] GridPoints { get => _gridPoints; set => _gridPoints = value; }
     private bool GameActive { get => _gameActive; set => _gameActive = value; }
@@ -95,11 +95,14 @@ public class ObjectSpawner : MonoBehaviour
 
         //aanpassen camera grootte voor beeldverhouding
         //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met grootte 7 en beeldverhouding van 16:9 altijd in past
-        float currentAspectRatio = (float)Screen.width / (float)Screen.height;
         float standardAspectRatio = 16.0f / 9.0f;
         //maak de camera niet kleiner, dan past de standaard hoogte niet meer
-        float aspectMultiplier = Math.Max(standardAspectRatio / currentAspectRatio, 1.0f);
+        float aspectMultiplier = Math.Max(standardAspectRatio / Camera.main.aspect, 1.0f);
         Camera.main.orthographicSize = 7.0f * aspectMultiplier;
+
+        //Hou achtergrond (gras) in beeld
+        if (GrassBackground != null)
+            GrassBackground.size = new Vector2(Camera.main.orthographicSize * 2.0f * Camera.main.aspect, Camera.main.orthographicSize * 2.0f);
 
         //vlees spawnen op de barbecue
         if (Time.time - LastSpawnTime > (6 - Difficulty) / SpawnRate && GameActive)
