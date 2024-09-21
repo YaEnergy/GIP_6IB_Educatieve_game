@@ -95,11 +95,10 @@ public class ObjectSpawner : MonoBehaviour
 
         //aanpassen camera grootte voor beeldverhouding
         //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met grootte 7 en beeldverhouding van 16:9 altijd in past
+        float currentAspectRatio = (float)Screen.width / (float)Screen.height;
         float standardAspectRatio = 16.0f / 9.0f;
-        float currentCameraWidth = (float)Camera.main.pixelWidth;
-        float standardCameraWidth = (float)Camera.main.pixelHeight * standardAspectRatio;
         //maak de camera niet kleiner, dan past de standaard hoogte niet meer
-        float aspectMultiplier = Math.Max(standardCameraWidth / currentCameraWidth, 1.0f);
+        float aspectMultiplier = Math.Max(standardAspectRatio / currentAspectRatio, 1.0f);
         Camera.main.orthographicSize = 7.0f * aspectMultiplier;
 
         //vlees spawnen op de barbecue
