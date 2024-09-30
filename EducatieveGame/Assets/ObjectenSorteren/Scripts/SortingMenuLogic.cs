@@ -47,14 +47,14 @@ public class SortingMenuLogic : MenuLogic
 
     public void ToggleColor(int index) //kleur aan/uit zetten
     {
-        if (GameColors[index].transform.GetChild(0).GetComponent<Image>().enabled)
+        if (GameColors[index].transform.GetChild(1).GetComponent<Image>().enabled)
         {
-            GameColors[index].transform.GetChild(0).GetComponent<Image>().enabled = false;
+            GameColors[index].transform.GetChild(1).GetComponent<Image>().enabled = false;
             EnabledColors--;
         }
         else
         {
-            GameColors[index].transform.GetChild(0).GetComponent<Image>().enabled = true;
+            GameColors[index].transform.GetChild(1).GetComponent<Image>().enabled = true;
             EnabledColors++;
         }
     }
@@ -67,10 +67,13 @@ public class SortingMenuLogic : MenuLogic
         List<string> selectedSortingTexts = new();
         for (int i = 0; i < GameColors.Length; i++)
         {
-            if (GameColors[i].transform.GetChild(0).GetComponent<Image>().enabled)
+            if (GameColors[i].transform.GetChild(1).GetComponent<Image>().enabled)
             {
-                sortingColors.Add(GameColors[i].transform.GetComponent<Image>().color);
-                selectedSortingColors.Add(GameColors[i].transform.GetComponent<Image>().color);
+                Transform colorTransform = GameColors[i].transform.GetChild(2);
+                Image colorImage = colorTransform.GetComponent<Image>();
+
+                sortingColors.Add(colorImage.color);
+                selectedSortingColors.Add(colorImage.color);
                 sortingTexts.Add(GameColors[i].transform.name);
                 selectedSortingTexts.Add(GameColors[i].transform.name);
             }
