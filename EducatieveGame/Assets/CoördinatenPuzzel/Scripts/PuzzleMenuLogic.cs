@@ -15,6 +15,12 @@ public class PuzzleMenuLogic : MenuLogic
     [SerializeField] private Button _startButton; //de start knop
     [SerializeField] private TextMeshProUGUI _piecesText;
 
+    [SerializeField] private GameObject[] puzzleTypeMenus; //puzzle soort menus
+    [SerializeField] private Sprite[] puzzleTypeButtonSprites; //puzzle soort knop sprites
+    [SerializeField] private Image puzzleSwitchTypeButtonIcon; //puzzle verander soort knop icoon
+
+    private int currentPuzzleTypeSelection = 0;
+
     private static Sprite _puzzleImage; //afbeelding van puzzel
     private static string _puzzleName; //naam puzzel
 
@@ -24,6 +30,7 @@ public class PuzzleMenuLogic : MenuLogic
     private GameObject DeleteButton { get => _deleteButton; set => _deleteButton = value; }
     private Button StartButton { get => _startButton; set => _startButton = value; }
     private TextMeshProUGUI PiecesText { get => _piecesText; set => _piecesText = value; }
+
     public static Sprite PuzzleImage { get => _puzzleImage; set => _puzzleImage = value; }
     public static string PuzzleName { get => _puzzleName; set => _puzzleName = value; }
 
@@ -48,10 +55,21 @@ public class PuzzleMenuLogic : MenuLogic
         StartCoroutine(ResetScrollRect());
     }
 
+    public void NextPuzzleTypeSelection()
+    {
+        puzzleTypeMenus[currentPuzzleTypeSelection].SetActive(false);
+
+        currentPuzzleTypeSelection = (currentPuzzleTypeSelection + 1) % puzzleTypeMenus.Length;
+        puzzleTypeMenus[currentPuzzleTypeSelection].SetActive(true);
+
+        //zet puzzle switch button icoon sprite tot de volgende soort (in dit geval ook het vorige)
+        puzzleSwitchTypeButtonIcon.sprite = puzzleTypeButtonSprites[(currentPuzzleTypeSelection + 1) % puzzleTypeButtonSprites.Length];
+    }
+
     public void OpenDifficultySelection() //open difficulty menu met puzzel
     {
         StartButton.interactable = true;
-        Menus[2].SetActive(true);
+        Menus[1].SetActive(true);
         Menus[CurrentMenu].SetActive(false);
         Image preview = GameObject.FindWithTag("Preview").GetComponent<Image>();
         preview.sprite = PuzzleImage;
@@ -83,7 +101,7 @@ public class PuzzleMenuLogic : MenuLogic
     public void CloseDifficultySelection() //sluit difficulty menu
     {
         StartButton.interactable = false;
-        Menus[2].SetActive(false);
+        Menus[1].SetActive(false);
         Menus[CurrentMenu].SetActive(true);
     }
 
