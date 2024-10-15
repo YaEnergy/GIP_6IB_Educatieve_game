@@ -5,17 +5,17 @@ public class RotateGame : MonoBehaviour
 {
     [SerializeField] private GameObject _correctGrid; //object van het voorbeeld grid
     [SerializeField] private GameObject _gameGrid; //object van het game grid
-    [SerializeField] private GameObject _background;
+    [SerializeField] private SpriteRenderer _background;
     [SerializeField] private Sprite _partSprite; //part sprite zonder rooster
     private GridGenerator _correctGridGen; //gridgenerator van het voorbeeldgrid
     private GridGenerator _gameGridGen; //gridgenerator van het gamegrid
     private bool _gameInProgress = true; //zorgen dat je geen vakjes meer kunt draaien als het spel gedaan is
-    private int _width; //breedte grid
-    private int _height; //hoogte grid
+    [SerializeField] private int _width; //breedte grid
+    [SerializeField] private int _height; //hoogte grid
 
     private GameObject CorrectGrid { get => _correctGrid; set => _correctGrid = value; }
     private GameObject GameGrid { get => _gameGrid; set => _gameGrid = value; }
-    private GameObject Background { get => _background; set => _background = value; }
+    private SpriteRenderer Background { get => _background; set => _background = value; }
     private Sprite PartSprite { get => _partSprite; set => _partSprite = value; }
     private GridGenerator CorrectGridGen { get => _correctGridGen; set => _correctGridGen = value; }
     private GridGenerator GameGridGen { get => _gameGridGen; set => _gameGridGen = value; }
@@ -35,39 +35,38 @@ public class RotateGame : MonoBehaviour
         switch (difficulty)
         {
             case 1:
-                SetGridParameters(2, 4, 2, 8);
+                SetGridParameters(2, 4);
                 break;
 
             case 2:
-                SetGridParameters(4, 8, 2, 12);
+                SetGridParameters(4, 8);
                 break;
 
             case 3:
-                SetGridParameters(6, 12, 1, 7);
+                SetGridParameters(6, 12);
                 break;
 
             case 4:
-                SetGridParameters(8, 16, 1, 9);
+                SetGridParameters(8, 16);
                 break;
 
             default:
-                SetGridParameters(10, 20, 1, 11);
+                SetGridParameters(10, 20);
                 break;
         }
 
         //grid aanmaken met parameters
-        void SetGridParameters(int width, int height, int cellSize, int orthographicSizeOffset)
+        void SetGridParameters(int width, int height)
         {
-            CorrectGridGen.GenerateGrid(width, height, cellSize);
-            GameGridGen.GenerateGrid(width, height, cellSize);
+            const int CELL_SIZE = 1;
+
+            CorrectGridGen.GenerateGrid(width, height, CELL_SIZE);
+            GameGridGen.GenerateGrid(width, height, CELL_SIZE);
             Width = width;
             Height = height;
 
-            Vector3 camPosition = new(Camera.main.transform.position.x, Camera.main.transform.position.y, 0);
-            GameGrid.transform.position = new Vector3(camPosition.x + orthographicSizeOffset / 2f, camPosition.y, 0);
-            CorrectGrid.transform.position = new Vector3(camPosition.x - orthographicSizeOffset / 2f, camPosition.y, 0);
-            Camera.main.orthographicSize = orthographicSizeOffset;
-            Background.transform.localScale = new(orthographicSizeOffset / 12f, orthographicSizeOffset / 12f, 1);
+            GameGrid.transform.position = new Vector3(width / 2.0f + CELL_SIZE / 2.0f, 0.0f, 0.0f);
+            CorrectGrid.transform.position = new Vector3(-width / 2.0f - CELL_SIZE / 2.0f, 0.0f, 0.0f);
         }
 
         int col = 0;
@@ -170,6 +169,25 @@ public class RotateGame : MonoBehaviour
         }
     }
 
+    private void Update()
+    {
+        if (GameInProgress)
+        {
+            //aanpassen camera grootte voor beeldverhouding
+            //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met beeldverhouding van 16:9 altijd in past
+            float standardAspectRatio = 16.0f / 9.0f;
+            //maak de camera niet kleiner, dan past de standaard hoogte niet meer
+            float aspectMultiplier = Mathf.Max(standardAspectRatio / Camera.main.aspect, 1.0f);
+
+            //Hou hele grid in beeld
+            Camera.main.orthographicSize = Mathf.Max(Width * 2 + 3, Height + 3) * aspectMultiplier / 2.0f;
+
+            //Hou achtergrond (hout) in beeld
+            if (Background != null)
+                Background.size = new Vector2(Camera.main.orthographicSize * 2.0f * Camera.main.aspect, Camera.main.orthographicSize * 2.0f);
+        }
+    }
+
     public void CheckGameGrid() //figuurstukken uit het voorbeeld grid vergelijken met het game grid, ze groen of rood kleuren en de score teruggeven
     {
         int correctCells = 0;
@@ -189,9 +207,6 @@ public class RotateGame : MonoBehaviour
         GameInProgress = false;
         EndScreenLogic.EndGame("RotateFigure", "Figuur draaien", $"{correctCells}/{CorrectGrid.transform.childCount}", Camera.main.orthographicSize * 1.75f, Camera.main.transform.position, 5);
         DontDestroyOnLoad(GameGrid.transform.parent);
-        CorrectGrid.transform.position = new(-Camera.main.orthographicSize / 2f, CorrectGrid.transform.position.y, CorrectGrid.transform.position.z);
-        GameGrid.transform.position = new(Camera.main.orthographicSize / 2f, CorrectGrid.transform.position.y, CorrectGrid.transform.position.z);
-        GameGrid.transform.parent.position = new(1000, 0, 0);
         SceneManager.LoadScene("EndScreen");
     }
 }

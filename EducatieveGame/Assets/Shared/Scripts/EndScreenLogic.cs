@@ -53,6 +53,8 @@ public class EndScreenLogic : MenuLogic
         {
             GameObject.FindWithTag("Preview").SetActive(true);
             GameObject.FindWithTag("Preview").transform.SetParent(Preview);
+
+            //FIX ME: Causes placement problems
             GameObject.FindWithTag("Preview").transform.position = new(Preview.transform.position.x, Preview.transform.position.y - OffsetY, Preview.transform.position.z);
         }
         Camera.main.orthographicSize = CameraSize;
