@@ -10,8 +10,8 @@ public class RotateGame : MonoBehaviour
     private GridGenerator _correctGridGen; //gridgenerator van het voorbeeldgrid
     private GridGenerator _gameGridGen; //gridgenerator van het gamegrid
     private bool _gameInProgress = true; //zorgen dat je geen vakjes meer kunt draaien als het spel gedaan is
-    [SerializeField] private int _width; //breedte grid
-    [SerializeField] private int _height; //hoogte grid
+    private int _width; //breedte grid
+    private int _height; //hoogte grid
 
     private GameObject CorrectGrid { get => _correctGrid; set => _correctGrid = value; }
     private GameObject GameGrid { get => _gameGrid; set => _gameGrid = value; }
