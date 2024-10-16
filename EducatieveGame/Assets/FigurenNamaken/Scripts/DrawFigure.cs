@@ -9,11 +9,10 @@ public class DrawFigure : MonoBehaviour
 {
     [Header("UI")]
     [SerializeField] private TMP_InputField _figureNameText; //invoervak voor de figuurnaam
-    [SerializeField] private TextMeshProUGUI _widthText; //text voor breedte grid
-    [SerializeField] private TextMeshProUGUI _heightText; //text voor hoogte grid
-    [SerializeField] private TextMeshProUGUI _cellSizeText; //text voor celgrootte grid
+    [SerializeField] private TextMeshProUGUI _instructionText; //instructie text
+    [SerializeField] private GameObject _undoButtonObject;
+    [SerializeField] private GameObject _redoButtonObject;
     [SerializeField] private GameObject _gridSettings; //object van de gridinstellingen
-    [SerializeField] private GameObject _drawMode; //object van alle functies in tekenmodus
     [SerializeField] private Button _startButton; //object voor waarschuwing aanmaken figuur
     [Header("Settings")]
     [SerializeField] private int _minWidth; //minimum breedte grid
@@ -54,11 +53,10 @@ public class DrawFigure : MonoBehaviour
     };
 
     private TMP_InputField FigureNameText { get => _figureNameText; set => _figureNameText = value; }
-    private TextMeshProUGUI WidthText { get => _widthText; set => _widthText = value; }
-    private TextMeshProUGUI HeightText { get => _heightText; set => _heightText = value; }
-    private TextMeshProUGUI CellSizeText { get => _cellSizeText; set => _cellSizeText = value; }
+    private TextMeshProUGUI InstructionText { get => _instructionText; set => _instructionText = value; }
+    private GameObject UndoButtonObject { get => _undoButtonObject; set => _undoButtonObject = value; }
+    private GameObject RedoButtonObject { get => _redoButtonObject; set => _redoButtonObject = value; }
     private GameObject GridSettings { get => _gridSettings; set => _gridSettings = value; }
-    private GameObject DrawMode { get => _drawMode; set => _drawMode = value; }
     private Button StartButton { get => _startButton; set => _startButton = value; }
     private int MinWidth { get => _minWidth; set => _minWidth = value; }
     private int MinHeight { get => _minHeight; set => _minHeight = value; }
@@ -97,19 +95,21 @@ public class DrawFigure : MonoBehaviour
         Start = Instantiate(StartDot, Vector3.zero, Quaternion.identity, transform);
         Width = MaxWidth;
         Height = MaxHeight;
-        //WidthText.text = Width.ToString();
-        //HeightText.text = Height.ToString();
-        //CellSizeText.text = CellSize.ToString();
         LoadFigures();
     }
 
     private void Update()
     {
+        UpdateCamera();
+
         if (!SettingGridValues)
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
             if (GridFuncs.PositionInGrid(mousePosition) && Time.timeScale != 0) //logica voor de figuur te tekenen
             {
+                if (!CurrentDot.activeInHierarchy)
+                    CurrentDot.SetActive(true);
+
                 if (!StartDotPlaced)
                 {
                     Vector3 closestPositionOnGrid = GridFuncs.ClosestPositionOnGrid(mousePosition);
@@ -119,6 +119,7 @@ public class DrawFigure : MonoBehaviour
                         UndoneActions.Clear();
                         UndoneStartDot = Vector3.zero;
                         StartDotPlaced = true;
+                        Start.SetActive(true);
                         AddStartPos(closestPositionOnGrid);
                         LineRend.positionCount++;
                         LineRend.SetPosition(LineRend.positionCount - 1, closestPositionOnGrid);
@@ -129,7 +130,6 @@ public class DrawFigure : MonoBehaviour
                     }
                     CurrentDot.transform.position = closestPositionOnGrid;
                 }
-
                 else
                 {
                     Vector3 closestPositionOnGrid = GridFuncs.ClosestPosition(mousePosition, LineRend.GetPosition(LineRend.positionCount - 1), CellSize);
@@ -149,17 +149,33 @@ public class DrawFigure : MonoBehaviour
                     CurrentDot.transform.position = closestPositionOnGrid;
                 }
             }
-            else if (StartDotPlaced) //ervoor zorgen dat als de muis niet in het grid is dat de laatste lijn niet blijft staan
+            else
             {
-                AssistLineRend.SetPosition(AssistLineRend.positionCount - 1, AssistLineRend.GetPosition(AssistLineRend.positionCount - 2));
-                CurrentDot.transform.position = Vector3.zero;
-            }
-            else //ervoor zorgen als de muis niet in het grid is dat het startpunt dat nog niet gezet is verdwijnt
-            {
-                Start.transform.position = Vector3.zero;
-                CurrentDot.transform.position = Vector3.zero;
+                //ervoor zorgen als de muis niet in het grid is dat het startpunt dat nog niet gezet is verdwijnt
+                if (Start.activeInHierarchy != StartDotPlaced)
+                    Start.SetActive(StartDotPlaced);
+
+                if (CurrentDot.activeInHierarchy)
+                    CurrentDot.SetActive(false);
+
+                //ervoor zorgen dat als de muis niet in het grid is dat de laatste lijn niet blijft staan
+                if (StartDotPlaced)
+                    AssistLineRend.SetPosition(AssistLineRend.positionCount - 1, AssistLineRend.GetPosition(AssistLineRend.positionCount - 2));
             }
         }
+    }
+
+    private void UpdateCamera()
+    {
+        //aanpassen camera grootte voor beeldverhouding
+        //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met beeldverhouding van 16:9 altijd in past
+        float standardAspectRatio = 16.0f / 9.0f;
+        //maak de camera niet kleiner, dan past de standaard hoogte niet meer
+        float aspectMultiplier = Mathf.Max(standardAspectRatio / Camera.main.aspect, 1.0f);
+
+        //Hou hele grid in beeld en plaats voor bord overhouden
+        Camera.main.orthographicSize = Mathf.Max(Width + 3, Height + 3) * aspectMultiplier * ((float)CellSize * 0.32f);
+        Camera.main.transform.localPosition = new Vector3(0.0f, Camera.main.orthographicSize * 0.23f, -10.0f);
     }
 
     public void GenerateGrid() //genereer het grid, verberg de gridinstellingen en maak de instellingen voor tekenmodus zichtbaar
@@ -169,10 +185,13 @@ public class DrawFigure : MonoBehaviour
             SettingGridValues = false;
             GridGen.GenerateGrid(Width, Height, CellSize);
             GridSettings.SetActive(false);
-            DrawMode.SetActive(true);
             GameObject.FindWithTag("MenuLogic").GetComponent<FigureMenuLogic>().DisableMenuButtons();
             FigureName = FigureNameText.text + ".txt";
             StartButton.interactable = false;
+
+            InstructionText.text = "Teken een figuur";
+            UndoButtonObject.SetActive(true);
+            RedoButtonObject.SetActive(true);
         }
         else
         {
@@ -200,7 +219,6 @@ public class DrawFigure : MonoBehaviour
             if (Width < MaxWidth / CellSize)
             {
                 Width++;
-                WidthText.text = Width.ToString();
             }
         }
         else if (index == 1)
@@ -208,7 +226,6 @@ public class DrawFigure : MonoBehaviour
             if (Height < MaxHeight / CellSize)
             {
                 Height++;
-                HeightText.text = Height.ToString();
             }
         }
         else if (index == 2)
@@ -219,14 +236,11 @@ public class DrawFigure : MonoBehaviour
                 if (Width > MaxWidth / CellSize)
                 {
                     Width = MaxWidth / CellSize;
-                    WidthText.text = Width.ToString();
                 }
                 if (Height > MaxHeight / CellSize)
                 {
                     Height = MaxHeight / CellSize;
-                    HeightText.text = Height.ToString();
                 }
-                CellSizeText.text = CellSize.ToString();
             }
         }
     }
@@ -238,7 +252,6 @@ public class DrawFigure : MonoBehaviour
             if (Width > MinWidth / CellSize)
             {
                 Width--;
-                WidthText.text = Width.ToString();
             }
         }
         else if (index == 1)
@@ -246,7 +259,6 @@ public class DrawFigure : MonoBehaviour
             if (Height > MinHeight / CellSize)
             {
                 Height--;
-                HeightText.text = Height.ToString();
             }
         }
         else if (index == 2)
@@ -257,14 +269,11 @@ public class DrawFigure : MonoBehaviour
                 if (Width < MinWidth * CellSize)
                 {
                     Width = MinWidth * CellSize;
-                    WidthText.text = Width.ToString();
                 }
                 if (Height < MinHeight * CellSize)
                 {
                     Height = MinHeight * CellSize;
-                    HeightText.text = Height.ToString();
                 }
-                CellSizeText.text = CellSize.ToString();
             }
         }
     }
