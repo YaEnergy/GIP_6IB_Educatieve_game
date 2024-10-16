@@ -93,6 +93,8 @@ public class FigureGame : MonoBehaviour
 
     private void Update()
     {
+        UpdateCamera();
+
         if (I == 0) //startpunt plaatsen zodat de gebruiker weet waar de figuur begint
         {
             Arrows = TransformList(Arrows);
@@ -101,7 +103,6 @@ public class FigureGame : MonoBehaviour
             AddLinePoint(AssistLineRend);
             I++;
         }
-
         else if (I != LinePoints.Count) //de gebruiker de figuur laten tekenen
         {
             Vector3 mousePosition = Camera.main.ScreenToWorldPoint(Input.mousePosition);
@@ -114,12 +115,14 @@ public class FigureGame : MonoBehaviour
 
             if (GridFuncs.PositionInGrid(mousePosition) && Time.timeScale != 0)
             {
+                if (!CurrentDot.activeInHierarchy)
+                    CurrentDot.SetActive(true);
+
                 Vector3 closestPositionOnGrid;
 
                 closestPositionOnGrid = GridFuncs.ClosestPosition(mousePosition, LineRend.GetPosition(LineRend.positionCount - 1), CellSize);
                 CurrentDot.transform.position  = closestPositionOnGrid;
                 AssistLineRend.SetPosition(AssistLineRend.positionCount - 1, closestPositionOnGrid);
-
 
                 if (closestPositionOnGrid == LinePoints[I])
                 {
@@ -165,7 +168,9 @@ public class FigureGame : MonoBehaviour
             }
             else //ervoor zorgen dat als de muis niet in het grid is dat de laatste lijn niet blijft staan
             {
-                CurrentDot.transform.position = new(1000, 0, 0);
+                if (CurrentDot.activeInHierarchy)
+                    CurrentDot.SetActive(false);
+
                 AssistLineRend.SetPosition(AssistLineRend.positionCount - 1, AssistLineRend.GetPosition(AssistLineRend.positionCount - 2));
             }
         }
@@ -177,6 +182,19 @@ public class FigureGame : MonoBehaviour
                 EndGame();
             }
         }
+    }
+
+    private void UpdateCamera()
+    {
+        //aanpassen camera grootte voor beeldverhouding
+        //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met beeldverhouding van 16:9 altijd in past
+        float standardAspectRatio = 16.0f / 9.0f;
+        //maak de camera niet kleiner, dan past de standaard hoogte niet meer
+        float aspectMultiplier = Mathf.Max(standardAspectRatio / Camera.main.aspect, 1.0f);
+
+        //Hou hele grid in beeld en plaats voor bord overhouden
+        Camera.main.orthographicSize = Mathf.Max(Width + 3, Height + 3) * aspectMultiplier * ((float)CellSize * 0.32f);
+        Camera.main.transform.localPosition = new Vector3(40.0f, 40.0f + Camera.main.orthographicSize * 0.125f, -10.0f); //Offset is required due to being included in preset figures
     }
 
     private List<(int, int)> TransformList(List<(int, int)> inputList) //lijst met instructies aanpassen zodat als het meerdere keren na elkaar dezelfde kant op is dat dit klopt in de instructie

@@ -175,7 +175,7 @@ public class DrawFigure : MonoBehaviour
 
         //Hou hele grid in beeld en plaats voor bord overhouden
         Camera.main.orthographicSize = Mathf.Max(Width + 3, Height + 3) * aspectMultiplier * ((float)CellSize * 0.32f);
-        Camera.main.transform.localPosition = new Vector3(0.0f, Camera.main.orthographicSize * 0.23f, -10.0f);
+        Camera.main.transform.localPosition = new Vector3(40.0f, 40.0f + Camera.main.orthographicSize * 0.23f, -10.0f); //Offset is required due to being included in preset figures
     }
 
     public void GenerateGrid() //genereer het grid, verberg de gridinstellingen en maak de instellingen voor tekenmodus zichtbaar
