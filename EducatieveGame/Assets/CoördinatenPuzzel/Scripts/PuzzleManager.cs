@@ -100,12 +100,12 @@ public class PuzzleManager : MonoBehaviour
     private void Update()
     {
         //Update grid scale
-        //Base grid size: 1534x728
         //Base puzzle size: 160x160
+
         float basePuzzleSize = 160.0f;
 
         float gridScale = Mathf.Min(gridRect.rect.height / (basePuzzleSize * (rows + 1)), gridRect.rect.width / (basePuzzleSize * (columns + 1)));
-        Debug.Log(gridScale);
+        
         grid.localScale = new(gridScale, gridScale, 1.0f);
         puzzlePiecesViewGridLayout.cellSize = new(basePuzzleSize * gridScale, basePuzzleSize * gridScale);
     }
