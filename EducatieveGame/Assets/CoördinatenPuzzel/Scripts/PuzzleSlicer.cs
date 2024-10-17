@@ -8,7 +8,7 @@ public class PuzzleSlicer : MonoBehaviour, IDropHandler
 
     private GameObject PuzzlePiece { get => _puzzlePiece; set => _puzzlePiece = value; }
 
-    public (int, int, float) SliceImage(Texture2D image, int maxColumns, int maxRows) //afbeelding snijden in puzzelstukken
+    public (int, int) SliceImage(Texture2D image, int maxColumns, int maxRows) //afbeelding snijden in puzzelstukken
     {
         float imageAspect = (float)image.width / image.height;
 
@@ -24,8 +24,6 @@ public class PuzzleSlicer : MonoBehaviour, IDropHandler
             rows = Mathf.Min(maxRows, image.height);
             columns = Mathf.RoundToInt(rows * imageAspect);
         }
-
-        float gridScale = 4.4f / (rows + 1); //schaal grid
 
         //breedte en hoogte van 1 stuk
         int width = image.width / columns;
@@ -65,8 +63,8 @@ public class PuzzleSlicer : MonoBehaviour, IDropHandler
                 imagePart.name = $"{IntToChar(col + 1)}-{rows - row}"; //naam van puzzelstuk instellen met coordinaten
             }
         }
-
-        return (columns, rows, gridScale);
+        
+        return (columns, rows);
     }
 
     public char IntToChar(int num)

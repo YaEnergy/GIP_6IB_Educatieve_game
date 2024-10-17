@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
 
 public class PuzzleManager : MonoBehaviour
@@ -17,6 +16,14 @@ public class PuzzleManager : MonoBehaviour
     private bool _extraChance = true; //extra kans om puzzel te maken
     private bool _resetting = false;
     private List<GameObject> _puzzleSlots; //de vakjes voor puzzelstukken
+
+    private int rows;
+    private int columns;
+
+    private Transform grid;
+    private RectTransform gridRect;
+
+    private GridLayoutGroup puzzlePiecesViewGridLayout;
 
     private PuzzleSlicer PuzzleSlicer { get => _puzzleSlicer; set => _puzzleSlicer = value; }
     private GameObject PuzzleSlot { get => _puzzleSlot; set => _puzzleSlot = value; }
@@ -33,8 +40,8 @@ public class PuzzleManager : MonoBehaviour
     {
         int difficulty = MenuLogic.Difficulty;
 
-        //hier kan je nog scale, width, height en de afbeelding ophalen
-        (int columns, int rows, float gridScale) = PuzzleSlicer.SliceImage(PuzzleMenuLogic.PuzzleImage.texture, difficulty * 3, difficulty * 3); //slice afbeelding met scale, aantal kolommen en aantal rijen
+        //hier kan je nog width, height en de afbeelding ophalen
+        (columns, rows) = PuzzleSlicer.SliceImage(PuzzleMenuLogic.PuzzleImage.texture, difficulty * 3, difficulty * 3); //slice afbeelding met scale, aantal kolommen en aantal rijen
 
         //lijst van de de stukjes
         List<GameObject> parts = new();
@@ -52,10 +59,12 @@ public class PuzzleManager : MonoBehaviour
             parts[randomIndex].transform.SetAsFirstSibling();
             parts.RemoveAt(randomIndex);
         }
+        
+        grid = transform.GetChild(0);
+        grid.GetComponent<GridLayoutGroup>().constraintCount = columns + 1;
+        gridRect = grid.GetComponent<RectTransform>();
 
-        transform.GetChild(0).GetComponent<GridLayoutGroup>().constraintCount = columns + 1;
-        PuzzleSlicer.transform.GetChild(0).GetComponent<GridLayoutGroup>().cellSize *= gridScale;
-        transform.GetChild(0).transform.localScale = new(gridScale, gridScale, 1);
+        puzzlePiecesViewGridLayout = PuzzleSlicer.transform.GetChild(0).GetComponent<GridLayoutGroup>();
 
         PuzzleSlots = new();
 
@@ -86,6 +95,19 @@ public class PuzzleManager : MonoBehaviour
                 }
             }
         }
+    }
+
+    private void Update()
+    {
+        //Update grid scale
+        //Base grid size: 1534x728
+        //Base puzzle size: 160x160
+        float basePuzzleSize = 160.0f;
+
+        float gridScale = Mathf.Min(gridRect.rect.height / (basePuzzleSize * (rows + 1)), gridRect.rect.width / (basePuzzleSize * (columns + 1)));
+        Debug.Log(gridScale);
+        grid.localScale = new(gridScale, gridScale, 1.0f);
+        puzzlePiecesViewGridLayout.cellSize = new(basePuzzleSize * gridScale, basePuzzleSize * gridScale);
     }
 
     public void CheckPuzzleToggle()
