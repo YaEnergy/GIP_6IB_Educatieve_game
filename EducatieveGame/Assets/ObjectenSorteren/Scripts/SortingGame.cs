@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -8,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class SortingGame : MonoBehaviour
 {
     [SerializeField] private Vector3[] _spawnLocations; //de locaties waar objecten spawnen
-    [SerializeField] private Vector3 _conveyorSpawnLocation; //locatie waar object spawned op conveyor
+    [SerializeField] private Transform _conveyorItemSpawnTransform; //transform van conveyor item spawn, locatie waar object spawned op conveyor
     [SerializeField] private GameObject _sortingItem; //prefab sorteer object
     [SerializeField] private GameObject _sortingBox; //prefab sorteer box
     [SerializeField] private GameObject _conveyorEnd; //einde loopband
@@ -33,7 +34,7 @@ public class SortingGame : MonoBehaviour
     private bool _dragging = false;
 
     private Vector3[] SpawnLocations { get => _spawnLocations; set => _spawnLocations = value; }
-    private Vector3 ConveyorSpawnLocation { get => _conveyorSpawnLocation; set => _conveyorSpawnLocation = value; }
+    private Transform ConveyorItemSpawnTransform { get => _conveyorItemSpawnTransform; set => _conveyorItemSpawnTransform = value; }
     private GameObject SortingItem { get => _sortingItem; set => _sortingItem = value; }
     private GameObject SortingBox { get => _sortingBox; set => _sortingBox = value; }
     private GameObject ConveyorEnd { get => _conveyorEnd; set => _conveyorEnd = value; }
@@ -107,7 +108,7 @@ public class SortingGame : MonoBehaviour
 
         if (ConveyorMode)
         {
-            SpawnSortItem(ConveyorSpawnLocation);
+            SpawnSortItem(ConveyorItemSpawnTransform.position);
             AmountSpawned++;
             LastSpawnTime = Time.time;
         }
@@ -134,8 +135,10 @@ public class SortingGame : MonoBehaviour
         }
     }
 
-    private void Update() //sorteer objecten op loopband spawnen
+    private void Update()
     {
+        UpdateCamera();
+
         if (!AssistMode)
         {
             if (Mathf.Round(Timer - (Time.time - StartTime)) <= 0)
@@ -145,6 +148,8 @@ public class SortingGame : MonoBehaviour
 
             TimeText.text = $"Tijd: {Mathf.Round(Timer - (Time.time - StartTime))}";
         }
+
+        //sorteer objecten op loopband spawnen
 
         if (!ConveyorMode && GameObject.FindWithTag("SortItem") == null)
         {
@@ -180,11 +185,23 @@ public class SortingGame : MonoBehaviour
 
             if (Time.time - LastSpawnTime > ConveyorSpawnRate)
             {
-                SpawnSortItem(ConveyorSpawnLocation);
+                SpawnSortItem(ConveyorItemSpawnTransform.position);
                 AmountSpawned++;
                 LastSpawnTime = Time.time;
             }
         }
+    }
+
+    private void UpdateCamera()
+    {
+        //aanpassen camera grootte voor beeldverhouding
+        //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met beeldverhouding van 16:9 altijd in past
+        float standardAspectRatio = 16.0f / 9.0f;
+        //maak de camera niet kleiner, dan past de standaard hoogte niet meer
+        float aspectMultiplier = Mathf.Max(standardAspectRatio / Camera.main.aspect, 1.0f);
+
+        Camera.main.orthographicSize = 5.0f * aspectMultiplier;
+        Camera.main.transform.localPosition = new Vector3(0.0f, 0.0f, -10.0f); //Offset is required due to being included in preset figures
     }
 
     public void ItemSorted() //item goed gesorteerd
