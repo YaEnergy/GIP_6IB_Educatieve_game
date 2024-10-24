@@ -9,7 +9,7 @@ using UnityEngine.SceneManagement;
 public class SortingGame : MonoBehaviour
 {
     [SerializeField] private Vector3[] _spawnLocations; //de locaties waar objecten spawnen
-    [SerializeField] private Transform _conveyorItemSpawnTransform; //transform van conveyor item spawn, locatie waar object spawned op conveyor
+    [SerializeField] private GameObject _conveyorItemSpawn; //conveyor item spawn location object, locatie waar object spawned op conveyor
     [SerializeField] private GameObject _sortingItem; //prefab sorteer object
     [SerializeField] private GameObject _sortingBox; //prefab sorteer box
     [SerializeField] private GameObject _conveyorEnd; //einde loopband
@@ -34,7 +34,7 @@ public class SortingGame : MonoBehaviour
     private bool _dragging = false;
 
     private Vector3[] SpawnLocations { get => _spawnLocations; set => _spawnLocations = value; }
-    private Transform ConveyorItemSpawnTransform { get => _conveyorItemSpawnTransform; set => _conveyorItemSpawnTransform = value; }
+    private GameObject ConveyorItemSpawn { get => _conveyorItemSpawn; set => _conveyorItemSpawn = value; }
     private GameObject SortingItem { get => _sortingItem; set => _sortingItem = value; }
     private GameObject SortingBox { get => _sortingBox; set => _sortingBox = value; }
     private GameObject ConveyorEnd { get => _conveyorEnd; set => _conveyorEnd = value; }
@@ -72,6 +72,7 @@ public class SortingGame : MonoBehaviour
             ConveyorMode = true;
             ConveyorSpawnRate /= (MenuLogic.Difficulty / 1.5f);
             Conveyor.GetComponent<Animator>().enabled = true;
+            ConveyorItemSpawn.SetActive(true);
         }
 
         if (!TrashcanMode && !ConveyorMode)
@@ -108,7 +109,7 @@ public class SortingGame : MonoBehaviour
 
         if (ConveyorMode)
         {
-            SpawnSortItem(ConveyorItemSpawnTransform.position);
+            SpawnSortItem(ConveyorItemSpawn.transform.position);
             AmountSpawned++;
             LastSpawnTime = Time.time;
         }
@@ -185,7 +186,7 @@ public class SortingGame : MonoBehaviour
 
             if (Time.time - LastSpawnTime > ConveyorSpawnRate)
             {
-                SpawnSortItem(ConveyorItemSpawnTransform.position);
+                SpawnSortItem(ConveyorItemSpawn.transform.position);
                 AmountSpawned++;
                 LastSpawnTime = Time.time;
             }

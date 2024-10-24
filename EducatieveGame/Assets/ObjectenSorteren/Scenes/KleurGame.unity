@@ -1555,7 +1555,7 @@ MonoBehaviour:
   - {x: 0, y: -1.8, z: 0}
   - {x: 2, y: -1.8, z: 0}
   - {x: 4, y: -1.8, z: 0}
-  _conveyorItemSpawnTransform: {fileID: 796127553}
+  _conveyorItemSpawn: {fileID: 796127552}
   _sortingItem: {fileID: 4693146641142316485, guid: ff4d76d1ea77e27409be489110fff2e7, type: 3}
   _sortingBox: {fileID: 4188673394859744971, guid: 8e89e56bfad761d4b805c11ba22f8ff8, type: 3}
   _conveyorEnd: {fileID: 1867434916}
@@ -1850,7 +1850,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &796127553
 Transform:
   m_ObjectHideFlags: 0
