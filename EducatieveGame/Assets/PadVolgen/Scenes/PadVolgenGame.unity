@@ -1269,12 +1269,16 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6774063513356787569, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_Type
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 6774063513356787569, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 83a10180a1c08a043aafdb1f701892e5, type: 3}
+    - target: {fileID: 6774063513356787569, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
+      propertyPath: m_PixelsPerUnitMultiplier
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 7225145721357752607, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_fontSize
       value: 40
@@ -1313,19 +1317,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8029639176231272550, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_Type
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8029639176231272550, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 83a10180a1c08a043aafdb1f701892e5, type: 3}
+    - target: {fileID: 8029639176231272550, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
+      propertyPath: m_PixelsPerUnitMultiplier
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8086680437119326622, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 119830337}
     - target: {fileID: 8297962710924339601, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_Type
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 8297962710924339601, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_Sprite
@@ -1341,6 +1349,10 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 8297962710924339601, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_Color.r
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8297962710924339601, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
+      propertyPath: m_PixelsPerUnitMultiplier
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 9121224933324856548, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
