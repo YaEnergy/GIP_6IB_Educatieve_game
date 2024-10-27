@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.CompilerServices;
 using TMPro;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -17,6 +16,7 @@ public class SortingGame : MonoBehaviour
     [SerializeField] private TextMeshProUGUI _scoreText; //de tekst van de score
     [SerializeField] private TextMeshProUGUI _timeText; //de tekst van de tijd
     [SerializeField] private GameObject _conveyor; //de loopband
+    [SerializeField] private Transform _background; //achtergrond
     private Color[] _sortingColors; //de kleuren om mee te sorteren
     private Color[] _selectedSortingColors; //de geselecteerde kleuren om mee te sorteren
     private string[] _sortingTexts; //de kleur teksten om mee te sorteren
@@ -32,6 +32,8 @@ public class SortingGame : MonoBehaviour
     private int _amountSpawned = 0; //teller loopband sorteermodus switchen
     private float _startTime = 0f; //startijd van het spel
     private bool _dragging = false;
+
+    private SpriteRenderer conveyorSpriteRenderer;
 
     private Vector3[] SpawnLocations { get => _spawnLocations; set => _spawnLocations = value; }
     private GameObject ConveyorItemSpawn { get => _conveyorItemSpawn; set => _conveyorItemSpawn = value; }
@@ -56,10 +58,13 @@ public class SortingGame : MonoBehaviour
     private int AmountSpawned { get => _amountSpawned; set => _amountSpawned = value; }
     private float StartTime { get => _startTime; set => _startTime = value; }
     private GameObject Conveyor { get => _conveyor; set => _conveyor = value; }
+    private Transform Background { get => _background; set => _background = value; }
     public bool Dragging { get => _dragging; set => _dragging = value; }
 
     private void Awake() //spel starten met juiste instellingen
     {
+        conveyorSpriteRenderer = Conveyor.GetComponent<SpriteRenderer>();
+
         ConveyorEnd.GetComponent<SortBox>().Create(Color.white, string.Empty, true);
 
         if (PlayerPrefs.GetInt("trashcan") == 1) //vuilbak instellen
@@ -74,10 +79,14 @@ public class SortingGame : MonoBehaviour
             Conveyor.GetComponent<Animator>().enabled = true;
             ConveyorItemSpawn.SetActive(true);
         }
+        else
+        {
+            Conveyor.transform.position = new Vector3(0.0f, Conveyor.transform.position.y, Conveyor.transform.position.z);
+        }
 
         if (!TrashcanMode && !ConveyorMode)
         {
-            ConveyorEnd.GetComponent<Collider2D>().enabled = false;
+            ConveyorEnd.SetActive(false);
         }
 
         int difficulty = MenuLogic.Difficulty + 1;
@@ -139,6 +148,8 @@ public class SortingGame : MonoBehaviour
     private void Update()
     {
         UpdateCamera();
+
+        UpdateSceneAspectRatio();
 
         if (!AssistMode)
         {
@@ -203,6 +214,29 @@ public class SortingGame : MonoBehaviour
 
         Camera.main.orthographicSize = 5.0f * aspectMultiplier;
         Camera.main.transform.localPosition = new Vector3(0.0f, 0.0f, -10.0f); //Offset is required due to being included in preset figures
+    }
+
+    private void UpdateSceneAspectRatio()
+    {
+        if (!ConveyorMode)
+            conveyorSpriteRenderer.size = new(Camera.main.orthographicSize * Camera.main.aspect * 2.0f, 2.4f);
+
+        //Base orthographic size: 5.0f
+        //Base aspect ratio: (16.0f / 9.0f)
+        //Base background scale: 3
+        //Base position = 0.13, -1.28, 1
+
+        // Fitting in width:
+        // 3.0f / (ortho * aspect * 2.0f) = newScale / (newOrtho * newAspect * 2.0f)
+        // (3.0f / (ortho * aspect * 2.0f)) * (newOrtho * newAspect * 2.0f) = newScale
+
+        // Fitting in height:
+        // 3.0f / (ortho * 2.0f) = newScale / (newOrtho * 2.0f)
+        // (3.0f / (ortho * 2.0f)) * (newOrtho * 2.0f) = newScale
+
+        float scale = Mathf.Max(0.3f * (Camera.main.orthographicSize * 2.0f), 0.16875f * (Camera.main.orthographicSize * Camera.main.aspect * 2.0f));
+        Background.transform.localScale = new Vector3(scale, scale, 1.0f);
+        Background.transform.position = new Vector3(0.13f / 3.0f * scale, -1.28f / 3.0f * scale, 1.0f);
     }
 
     public void ItemSorted() //item goed gesorteerd
