@@ -79,7 +79,7 @@ public class SortingMenuLogic : MenuLogic
             }
             else
             {
-                sortingColors.Add(GameColors[i].transform.GetComponent<Image>().color);
+                sortingColors.Add(GameColors[i].transform.GetChild(2).GetComponent<Image>().color);
                 sortingTexts.Add(GameColors[i].transform.name);
             }
         }

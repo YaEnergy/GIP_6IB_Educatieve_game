@@ -1024,38 +1024,6 @@ PrefabInstance:
       propertyPath: _elementAspectRatio
       value: 1.4545455
       objectReference: {fileID: 0}
-    - target: {fileID: 8161499918367329027, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
-      propertyPath: m_AnchorMax.x
-      value: 0.8
-      objectReference: {fileID: 0}
-    - target: {fileID: 8161499918367329027, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
-      propertyPath: m_AnchorMax.y
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 8161499918367329027, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
-      propertyPath: m_AnchorMin.x
-      value: 0.2
-      objectReference: {fileID: 0}
-    - target: {fileID: 8161499918367329027, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
-      propertyPath: m_AnchorMin.y
-      value: 0.25
-      objectReference: {fileID: 0}
-    - target: {fileID: 8161499918367329027, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
-      propertyPath: m_SizeDelta.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8161499918367329027, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
-      propertyPath: m_SizeDelta.y
-      value: -300
-      objectReference: {fileID: 0}
-    - target: {fileID: 8161499918367329027, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
-      propertyPath: m_AnchoredPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 8161499918367329027, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
-      propertyPath: m_AnchoredPosition.y
-      value: -135
-      objectReference: {fileID: 0}
     - target: {fileID: 8225832468716129881, guid: 7195814148a1b1a478df71175c4ba0b5, type: 3}
       propertyPath: m_SizeDelta.x
       value: -100

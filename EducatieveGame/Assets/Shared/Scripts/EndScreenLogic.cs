@@ -115,15 +115,14 @@ public class EndScreenLogic : MenuLogic
                 GameStats.GetChild(4).GetChild(2).GetChild(0).GetComponent<Toggle>().isOn = true;
             }
 
-            GameObject selectedColors = GameStats.GetChild(4).GetChild(3).gameObject;
+            GameObject selectedColors = GameStats.GetChild(4).GetChild(3).GetChild(0).GetChild(0).gameObject;
             Color[] usedColors = SortingMenuLogic.SelectedSortingColors;
 
             for (int i = 0; i < selectedColors.transform.childCount; i++)
             {
-                if (usedColors.Contains(selectedColors.transform.GetChild(i).GetComponent<Image>().color))
-                {
-                    selectedColors.transform.GetChild(i).GetChild(0).GetComponent<Image>().enabled = true;
-                }
+                Image colorImage = selectedColors.transform.GetChild(i).GetChild(2).GetComponent<Image>();
+                Image colorCheck = selectedColors.transform.GetChild(i).GetChild(1).GetComponent<Image>();
+                colorCheck.enabled = usedColors.Contains(colorImage.color);
             }
         }
         else if (CurrentGame.Equals("PadVolgenMenu"))
