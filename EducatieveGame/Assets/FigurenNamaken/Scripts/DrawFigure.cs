@@ -4,6 +4,7 @@ using UnityEngine;
 using TMPro;
 using System.Linq;
 using UnityEngine.UI;
+using System;
 
 public class DrawFigure : MonoBehaviour
 {
@@ -167,17 +168,15 @@ public class DrawFigure : MonoBehaviour
 
     private void UpdateCamera()
     {
-        //aanpassen camera grootte voor beeldverhouding
-        //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met beeldverhouding van 16:9 altijd in past
-        float standardAspectRatio = 16.0f / 9.0f;
-        //maak de camera niet kleiner, dan past de standaard hoogte niet meer
-        float aspectMultiplier = Mathf.Max(standardAspectRatio / Camera.main.aspect, 1.0f);
-
         //Hou hele grid in beeld en plaats voor bord overhouden
-        Camera.main.orthographicSize = Mathf.Max(Width + 3, Height + 3) * aspectMultiplier * ((float)CellSize * 0.32f);
-        Camera.main.transform.localPosition = new Vector3(40.0f, 40.0f + Camera.main.orthographicSize * 0.23f, -10.0f); //Offset is required due to being included in preset figures
-    }
 
+        //W: 0 to 1 (1.0)
+        //H: 0.15 to 0.77 (0.62)
+
+        Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect((Width + 2) * CellSize, (Height + 2) * CellSize / 0.62f, Camera.main.aspect);
+        Camera.main.transform.localPosition = new Vector3(40.0f, 40.0f + Camera.main.orthographicSize * 0.08f, -10.0f); //Offset is required due to being included in preset figures
+    }
+    
     public void GenerateGrid() //genereer het grid, verberg de gridinstellingen en maak de instellingen voor tekenmodus zichtbaar
     {
         if (SettingGridValues)

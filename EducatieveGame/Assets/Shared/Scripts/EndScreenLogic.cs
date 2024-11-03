@@ -46,7 +46,6 @@ public class EndScreenLogic : MenuLogic
         {
             GameObject.FindWithTag("GameView").SetActive(true);
             GameObject.FindWithTag("GameView").transform.parent = GameView;
-            //GameObject.FindWithTag("GameView").transform.position = new(GameView.transform.position.x, GameView.transform.position.y - OffsetY, GameView.transform.position.z);
         }
         GameObject preview = GameObject.FindWithTag("Preview");
         if (preview != null)
@@ -55,7 +54,7 @@ public class EndScreenLogic : MenuLogic
             GameObject.FindWithTag("Preview").transform.SetParent(Preview);
 
             //FIX ME: Causes placement problems
-            GameObject.FindWithTag("Preview").transform.position = new(Preview.transform.position.x, Preview.transform.position.y - OffsetY, Preview.transform.position.z);
+            //GameObject.FindWithTag("Preview").transform.position = new(Preview.transform.position.x, Preview.transform.position.y - OffsetY, Preview.transform.position.z);
         }
         Camera.main.orthographicSize = CameraSize;
 
@@ -83,7 +82,7 @@ public class EndScreenLogic : MenuLogic
             {
                 Vector3 position = lineRend.GetPosition(i);
                 position.x -= 40;
-                position.y -= 40 + OffsetY;
+                position.y -= 40;
                 lineRend.SetPosition(i, position);
             } 
         }

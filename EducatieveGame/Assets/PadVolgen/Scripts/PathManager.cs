@@ -43,18 +43,14 @@ public class PathManager : MonoBehaviour
         if (gameEnded)
         {
             //Hou hele grid in beeld met margin percentage voor eindscherm UI
-            //(ortho * 2) * (fitPercentHeight) = gridHeight => ortho = gridHeight / fitPercentHeight / 2
-            //(ortho * aspect * 2) * (fitPercentWidth) = gridWidth => ortho = gridWidth / fitPercentWidth / aspect / 2
-            Camera.main.orthographicSize = Mathf.Max(Grid.Width / 0.6f / Camera.main.aspect, Grid.Height / 0.54f) / 2.0f;
+            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect(Grid.Width / 0.6f, Grid.Height / 0.54f, Camera.main.aspect);
             Camera.main.transform.localPosition = new Vector3(Grid.Width * 0.7f - 0.5f, Grid.Height * 0.65f - 0.5f, -10.0f); //normalized anchor position
         }
         else
         {
             //Hou hele grid in beeld met margin percentage
-            //(ortho * 2) * (0.65) = gridHeight => ortho = gridHeight / 0.65 / 2
-            //(ortho * aspect * 2) * (0.8) = gridWidth => ortho = gridWidth / 0.8 / aspect / 2
-            Camera.main.orthographicSize = Mathf.Max(Grid.Width / 0.8f / Camera.main.aspect, Grid.Height / 0.65f) / 2.0f;
-
+            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect(Grid.Width, (Grid.Height + 2) / 0.65f, Camera.main.aspect);
+            
             //Hou achtergrond (gras) in beeld
             if (Background != null)
                 Background.size = new Vector2(Camera.main.orthographicSize * 2.0f * Camera.main.aspect, Camera.main.orthographicSize * 2.0f);

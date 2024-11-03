@@ -43,6 +43,8 @@ public class FigureGame : MonoBehaviour
         { (1, 1), "Right-Up" }
     };
 
+    private bool gameEnded = false;
+
     private GameObject Instructions { get => _instructions; set => _instructions = value; }
     private TextMeshProUGUI Count { get => _count; set => _count = value; }
     private RectTransform Arrow { get => _arrow; set => _arrow = value; }
@@ -94,6 +96,9 @@ public class FigureGame : MonoBehaviour
     private void Update()
     {
         UpdateCamera();
+
+        if (gameEnded)
+            return;
 
         if (I == 0) //startpunt plaatsen zodat de gebruiker weet waar de figuur begint
         {
@@ -186,15 +191,21 @@ public class FigureGame : MonoBehaviour
 
     private void UpdateCamera()
     {
-        //aanpassen camera grootte voor beeldverhouding
-        //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met beeldverhouding van 16:9 altijd in past
-        float standardAspectRatio = 16.0f / 9.0f;
-        //maak de camera niet kleiner, dan past de standaard hoogte niet meer
-        float aspectMultiplier = Mathf.Max(standardAspectRatio / Camera.main.aspect, 1.0f);
-
         //Hou hele grid in beeld en plaats voor bord overhouden
-        Camera.main.orthographicSize = Mathf.Max(Width + 3, Height + 3) * aspectMultiplier * ((float)CellSize * 0.32f);
-        Camera.main.transform.localPosition = new Vector3(40.0f, 40.0f + Camera.main.orthographicSize * 0.125f, -10.0f); //Offset is required due to being included in preset figures
+
+        //W: 0 to 1 (1.0)
+        //H: 0.15 to 0.77 (0.62)
+
+        if (gameEnded)
+        {
+            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect(Width * CellSize / 0.6f, Height * CellSize / 0.54f, Camera.main.aspect);
+            Camera.main.transform.localPosition = new Vector3(0.0f, Camera.main.orthographicSize * 0.08f, -10.0f);
+        }
+        else
+        {
+            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect((Width + 2) * CellSize, (Height + 2) * CellSize / 0.62f, Camera.main.aspect);
+            Camera.main.transform.localPosition = new Vector3(40.0f, 40.0f + Camera.main.orthographicSize * 0.08f, -10.0f); //Offset is required due to being included in preset figures
+        }
     }
 
     private List<(int, int)> TransformList(List<(int, int)> inputList) //lijst met instructies aanpassen zodat als het meerdere keren na elkaar dezelfde kant op is dat dit klopt in de instructie
@@ -364,7 +375,8 @@ public class FigureGame : MonoBehaviour
         {
             EndScreenLogic.EndGame("SelectDrawMode", "Figuur namaken", $"/", Camera.main.orthographicSize * 1.75f, new(0, 0, -10), 5);
         }
-        enabled = false;
+        //enabled = false;
+        gameEnded = true;
         DontDestroyOnLoad(gameObject);
         SceneManager.LoadScene("EndScreen");
     }
