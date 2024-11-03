@@ -46,7 +46,7 @@ public class EndScreenLogic : MenuLogic
         {
             GameObject.FindWithTag("GameView").SetActive(true);
             GameObject.FindWithTag("GameView").transform.parent = GameView;
-            GameObject.FindWithTag("GameView").transform.position = new(GameView.transform.position.x, GameView.transform.position.y - OffsetY, GameView.transform.position.z);
+            //GameObject.FindWithTag("GameView").transform.position = new(GameView.transform.position.x, GameView.transform.position.y - OffsetY, GameView.transform.position.z);
         }
         GameObject preview = GameObject.FindWithTag("Preview");
         if (preview != null)

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
@@ -10,9 +11,14 @@ public class PathManager : MonoBehaviour
     [SerializeField] private PathGrid _grid;
     [SerializeField] private PathFinder _finder;
     [SerializeField] private int _locations;
+    [SerializeField] private SpriteRenderer _background;
     private List<PathTile> _randomPath = new(); //lijst met tiles van het pad
     private List<PathTile> _AStarPath = new(); //lijst met tiles van het A Star pad
     private List<PathTile> _checkpoints = new(); //tiles start, locaties en einde
+    
+    private SpriteRenderer Background { get => _background; set => _background = value; }
+
+    private bool gameEnded = false;
 
     public PathFunctions Functions { get => _functions; private set => _functions = value; }
     public PathAStar AStar { get => _aStar; private set => _aStar = value; }
@@ -30,13 +36,65 @@ public class PathManager : MonoBehaviour
         Generator.GeneratePath(Generator.SpawnPlayer(), MenuLogic.Difficulty);
     }
 
-    public void EndGame()
+    private void Update()
+    {
+        //aanpassen camera grootte voor beeldverhouding
+
+        if (gameEnded)
+        {
+            //Hou hele grid in beeld met margin percentage voor eindscherm UI
+            //(ortho * 2) * (fitPercentHeight) = gridHeight => ortho = gridHeight / fitPercentHeight / 2
+            //(ortho * aspect * 2) * (fitPercentWidth) = gridWidth => ortho = gridWidth / fitPercentWidth / aspect / 2
+            Camera.main.orthographicSize = Mathf.Max(Grid.Width / 0.6f / Camera.main.aspect, Grid.Height / 0.54f) / 2.0f;
+            Camera.main.transform.localPosition = new Vector3(Grid.Width * 0.7f - 0.5f, Grid.Height * 0.65f - 0.5f, -10.0f); //normalized anchor position
+        }
+        else
+        {
+            //Hou hele grid in beeld met margin percentage
+            //(ortho * 2) * (0.65) = gridHeight => ortho = gridHeight / 0.65 / 2
+            //(ortho * aspect * 2) * (0.8) = gridWidth => ortho = gridWidth / 0.8 / aspect / 2
+            Camera.main.orthographicSize = Mathf.Max(Grid.Width / 0.8f / Camera.main.aspect, Grid.Height / 0.65f) / 2.0f;
+
+            //Hou achtergrond (gras) in beeld
+            if (Background != null)
+                Background.size = new Vector2(Camera.main.orthographicSize * 2.0f * Camera.main.aspect, Camera.main.orthographicSize * 2.0f);
+            
+            //camera centreren op het grid
+            Camera.main.transform.position = new Vector3((float)Grid.Width / 2 - 0.5f, (float)Grid.Height / 2 - 0.5f, -10);
+        }
+
+    }
+
+    private double CalculateScore()
+    {
+        Player player = GameObject.FindWithTag("Player").GetComponent<Player>();
+
+        if (Generator.Arrows && !Generator.ScrambledOrder)
+            return Math.Round((double)RandomPath.Count / (player.Steps + player.WrongSteps), 2) * 100;
+        else
+            return Math.Round((double)AStarPath.Count / (player.Steps + player.WrongSteps), 2) * 100;
+    }
+
+    public void CancelGame()
+    {
+        EndScreenLogic.EndGame("PadVolgenMenu", "Pad volgen", "Finish niet behaald", Camera.main.orthographicSize * 1.25f, Camera.main.transform.position, Camera.main.orthographicSize / 2.5f);
+        EndGame();
+    }
+
+    public void WinGame()
+    {
+        EndScreenLogic.EndGame("PadVolgenMenu", "Pad volgen", CalculateScore().ToString() + "%", Camera.main.orthographicSize * 1.25f, Camera.main.transform.position, Camera.main.orthographicSize / 2.5f);
+        EndGame();
+    }
+
+    private void EndGame()
     {
         Grid.DisableAllTiles();
-        EndScreenLogic.EndGame("PadVolgenMenu", "Pad volgen", "Finish niet behaald", Camera.main.orthographicSize * 1.25f, Camera.main.transform.position, Camera.main.orthographicSize / 2.5f);
+        
         GameObject gameview = GameObject.FindWithTag("GameView");
         gameview.transform.SetParent(null);
         gameview.transform.localScale = new(gameview.transform.localScale.x, gameview.transform.localScale.y, 1);
+        gameEnded = true;
         DontDestroyOnLoad(gameview);
         SceneManager.LoadScene("EndScreen");
     }

@@ -125,11 +125,11 @@ public class PathTile : MonoBehaviour
                     Pad.Generator.ShowAStarPath(new(0.9f, 0f, 0f, 0.44f));
                     if (Pad.Generator.Arrows && !Pad.Generator.ScrambledOrder)
                     {
-                        StartCoroutine(EndGame((Math.Round((double)Pad.RandomPath.Count / (GameObject.FindWithTag("Player").GetComponent<Player>().Steps + GameObject.FindWithTag("Player").GetComponent<Player>().WrongSteps), 2) * 100).ToString()));
+                        StartCoroutine(EndGame());
                     }
                     else
                     {
-                        StartCoroutine(EndGame((Math.Round((double)Pad.AStarPath.Count / (GameObject.FindWithTag("Player").GetComponent<Player>().Steps + GameObject.FindWithTag("Player").GetComponent<Player>().WrongSteps), 2) * 100).ToString()));
+                        StartCoroutine(EndGame());
                     }
                 }
             }
@@ -143,18 +143,13 @@ public class PathTile : MonoBehaviour
         IsCheckpoint = isLocation;
     }
 
-    private IEnumerator EndGame(string score)
+    private IEnumerator EndGame()
     {
         Pad.Grid.DisableAllTiles();
         yield return new WaitForSeconds(0.4f);
         Instantiate(_finishParticle, transform.position, transform.rotation);
         yield return new WaitForSeconds(0.4f);
-        EndScreenLogic.EndGame("PadVolgenMenu", "Pad volgen", score + "%", Camera.main.orthographicSize * 1.25f, Camera.main.transform.position, Camera.main.orthographicSize / 2.5f);
-        GameObject gameview = GameObject.FindWithTag("GameView");
-        gameview.transform.SetParent(null);
-        gameview.transform.localScale = new(gameview.transform.localScale.x, gameview.transform.localScale.y, 1);
-        DontDestroyOnLoad(gameview);
-        SceneManager.LoadScene("EndScreen");
+        Pad.WinGame();
     }
 
     private IEnumerator StartCooldown()
