@@ -8,6 +8,19 @@ using UnityEngine;
 public static class CameraAspectRatioHelper
 {
     /// <summary>
+    /// Geeft beste envelopping orthographic size voor bepaalde camera beeldverhoudingen om rechthoek met grootte fitSize in te passen
+    /// </summary>
+    /// <param name="fitSize"></param>
+    /// <param name="cameraAspect"></param>
+    /// <returns>Camera orthographic size</returns>
+    public static float OrthographicSizeEnveloppeRect(Vector2 fitSize, float cameraAspect)
+    {
+        //(ortho * 2) = height => ortho = height / 2
+        //(ortho * aspect * 2) = width => ortho = width / aspect / 2
+        return Math.Max(fitSize.x / cameraAspect, fitSize.y) / 2.0f;
+    }
+
+    /// <summary>
     /// Geeft beste envelopping orthographic size voor bepaalde camera beeldverhoudingen om fitWidth & fitHeight in te passen
     /// </summary>
     /// <param name="fitWidth"></param>

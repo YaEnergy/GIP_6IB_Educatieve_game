@@ -16,9 +16,12 @@ public class EndScreenLogic : MenuLogic
     private static string _currentGame = "MainMenu"; //huidig spel scenename
     private static string _gameName = "Eindscherm"; //huidig spel naam
     private static string _score = "0/0%"; //behaalde score
-    private static float _cameraSize = 5; //camera grootte instelling
-    private static Vector3 _cameraPos = Vector3.zero; //camera positie instelling
-    private static float _offsetY = 5; //camera Y offset
+
+    private bool gameViewPresent = false; //Gameobject met GameView tag aanwezig
+
+    private static Vector2 _gameViewFitRectSize = Vector2.one; //grootte rechthoek waarin GameView past
+    private static Vector2 _gameViewNormalizedCameraOffset = Vector2.zero; //camera gameview offset, waarbij (1, 1) = (ortho * aspect * 2, ortho)
+    private static Vector3 _gameViewCameraOffset = Vector3.zero; //camera gameview offset in units
 
     private Transform Difficultys { get => _difficultys; set => _difficultys = value; }
     private Transform GameView { get => _gameView; set => _gameView = value; }
@@ -30,23 +33,30 @@ public class EndScreenLogic : MenuLogic
     private static string CurrentGame { get => _currentGame; set => _currentGame = value; }
     private static string GameName { get => _gameName; set => _gameName = value; }
     private static string Score { get => _score; set => _score = value; }
-    private static float CameraSize { get => _cameraSize; set => _cameraSize = value; }
-    private static Vector3 CameraPos { get => _cameraPos; set => _cameraPos = value; }
-    private static float OffsetY { get => _offsetY; set => _offsetY = value; }
+
+    private static Vector2 GameViewFitRectSize { get => _gameViewFitRectSize; set => _gameViewFitRectSize = value; }
+    private static Vector2 GameViewNormalizedCameraOffset { get => _gameViewNormalizedCameraOffset; set => _gameViewNormalizedCameraOffset = value; }
+    private static Vector3 GameViewCameraOffset { get => _gameViewCameraOffset; set => _gameViewCameraOffset = value; }
 
     private void Awake() //eindscherm instellen
     {
         AwakeBase();
-        Camera.main.transform.position = CameraPos;
+
+        Camera.main.transform.position = Vector3.zero;
+        Camera.main.orthographicSize = 5.0f;
+
         Difficultys.GetChild(Difficulty - 1).gameObject.SetActive(true);
         ScoreText.text = Score;
         TitleText.text = GameName;
+
         GameObject gameView = GameObject.FindWithTag("GameView");
         if (gameView != null)
         {
             GameObject.FindWithTag("GameView").SetActive(true);
             GameObject.FindWithTag("GameView").transform.parent = GameView;
+            gameViewPresent = true;
         }
+
         GameObject preview = GameObject.FindWithTag("Preview");
         if (preview != null)
         {
@@ -56,8 +66,7 @@ public class EndScreenLogic : MenuLogic
             //FIX ME: Causes placement problems
             //GameObject.FindWithTag("Preview").transform.position = new(Preview.transform.position.x, Preview.transform.position.y - OffsetY, Preview.transform.position.z);
         }
-        Camera.main.orthographicSize = CameraSize;
-
+    
         if (CurrentGame.Equals("RotateFigure"))
         {
             GameStats.GetChild(0).gameObject.SetActive(true);
@@ -96,7 +105,6 @@ public class EndScreenLogic : MenuLogic
         else if (CurrentGame.Equals("PuzzelGameMenu"))
         {
             GameStats.GetChild(3).gameObject.SetActive(true);
-
         }
         else if (CurrentGame.Equals("KleurGameMenu"))
         {
@@ -142,19 +150,37 @@ public class EndScreenLogic : MenuLogic
         }
     }
 
+    private void Update()
+    {
+        if (gameViewPresent)
+        {
+            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect(GameViewFitRectSize, Camera.main.aspect);
+            Camera.main.transform.position = new
+            (
+                Camera.main.orthographicSize * Camera.main.aspect * 2.0f * GameViewNormalizedCameraOffset.x + GameViewCameraOffset.x,
+                Camera.main.orthographicSize * 2.0f * GameViewNormalizedCameraOffset.y + GameViewCameraOffset.y,
+                GameViewCameraOffset.z - 10.0f
+            );
+        }
+    }
+
     public void NewGame() //scene laden van laatst gespeelde spel
     {
         SceneManager.LoadScene(CurrentGame);
     }
 
-    public static void EndGame(string sceneName, string gameName, string score, float cameraSize, Vector3 cameraPos, float offsetY) //spel beindigen waarden instellen
+    public static void EndGame(string sceneName, string gameName, string score) //spel beindigen waarden instellen
     {
         CurrentGame = sceneName;
         GameName = gameName;
         Score = score;
-        CameraSize = cameraSize;
-        CameraPos = cameraPos;
-        OffsetY = offsetY;
+    }
+
+    public static void SetGameViewCameraOptions(Vector2 fitRectSize, Vector2 normalizedCameraOffset, Vector3 offset)
+    {
+        GameViewFitRectSize = fitRectSize;
+        GameViewNormalizedCameraOffset = normalizedCameraOffset;
+        GameViewCameraOffset = offset;
     }
 
     public void ToggleShortestPath()

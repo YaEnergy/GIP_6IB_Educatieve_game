@@ -197,7 +197,7 @@ public class PuzzleManager : MonoBehaviour
 
     private void EndGame(string score) //spel beingigen
     {
-        EndScreenLogic.EndGame("PuzzelGameMenu", "Coördinaten puzzel", $"{score}", Camera.main.orthographicSize, Camera.main.transform.position, 0);
+        EndScreenLogic.EndGame("PuzzelGameMenu", "Coördinaten puzzel", $"{score}");
         GameObject preview = GameObject.FindWithTag("Preview");
         preview.transform.SetParent(null);
         preview.transform.localScale = new(preview.transform.localScale.x * 0.75f, preview.transform.localScale.y * 0.75f, 1);

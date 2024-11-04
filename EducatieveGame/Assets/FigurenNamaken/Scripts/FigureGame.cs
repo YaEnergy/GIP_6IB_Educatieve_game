@@ -191,18 +191,11 @@ public class FigureGame : MonoBehaviour
 
     private void UpdateCamera()
     {
-        //Hou hele grid in beeld en plaats voor bord overhouden
-
-        //W: 0 to 1 (1.0)
-        //H: 0.15 to 0.77 (0.62)
-
-        if (gameEnded)
+        if (!gameEnded)
         {
-            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect(Width * CellSize / 0.6f, Height * CellSize / 0.54f, Camera.main.aspect);
-            Camera.main.transform.localPosition = new Vector3(0.0f, Camera.main.orthographicSize * 0.08f, -10.0f);
-        }
-        else
-        {
+            //Hou hele grid in beeld en plaats voor bord overhouden
+            //W: 0 to 1 (1.0)
+            //H: 0.15 to 0.77 (0.62)
             Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect((Width + 2) * CellSize, (Height + 2) * CellSize / 0.62f, Camera.main.aspect);
             Camera.main.transform.localPosition = new Vector3(40.0f, 40.0f + Camera.main.orthographicSize * 0.08f, -10.0f); //Offset is required due to being included in preset figures
         }
@@ -369,14 +362,17 @@ public class FigureGame : MonoBehaviour
     {
         if (PlayerPrefs.GetInt("figure-assist") == 0)
         {
-            EndScreenLogic.EndGame("SelectDrawMode", "Figuur namaken", $"{StatsObj.StatValues[0]}/{_lines}", Camera.main.orthographicSize * 1.75f, new(0, 0, -10), 5);
+            EndScreenLogic.EndGame("SelectDrawMode", "Figuur namaken", $"{StatsObj.StatValues[0]}/{_lines}");
         }
         else
         {
-            EndScreenLogic.EndGame("SelectDrawMode", "Figuur namaken", $"/", Camera.main.orthographicSize * 1.75f, new(0, 0, -10), 5);
+            EndScreenLogic.EndGame("SelectDrawMode", "Figuur namaken", $"/");
         }
-        //enabled = false;
+
+        EndScreenLogic.SetGameViewCameraOptions(new(Width * CellSize / 0.6f, Height * CellSize / 0.54f), new(0.0f, 0.04f), Vector3.zero);
+        
         gameEnded = true;
+
         DontDestroyOnLoad(gameObject);
         SceneManager.LoadScene("EndScreen");
     }

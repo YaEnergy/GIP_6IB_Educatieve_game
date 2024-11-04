@@ -174,13 +174,8 @@ public class RotateGame : MonoBehaviour
         if (GameInProgress)
         {
             //aanpassen camera grootte voor beeldverhouding
-            //schaal de camera grootte zodat de lengte en hoogte van een standaard camera met beeldverhouding van 16:9 altijd in past
-            float standardAspectRatio = 16.0f / 9.0f;
-            //maak de camera niet kleiner, dan past de standaard hoogte niet meer
-            float aspectMultiplier = Mathf.Max(standardAspectRatio / Camera.main.aspect, 1.0f);
-
-            //Hou hele grid in beeld
-            Camera.main.orthographicSize = Mathf.Max(Width * 2 + 3, Height + 3) * aspectMultiplier / 2.0f;
+            //Hou beide grids in beeld
+            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect(Width * 2 + 3, Height + 3, Camera.main.aspect);
 
             //Hou achtergrond (hout) in beeld
             if (Background != null)
@@ -205,7 +200,8 @@ public class RotateGame : MonoBehaviour
         }
 
         GameInProgress = false;
-        EndScreenLogic.EndGame("RotateFigure", "Figuur draaien", $"{correctCells}/{CorrectGrid.transform.childCount}", Camera.main.orthographicSize * 1.75f, Camera.main.transform.position, 5);
+        EndScreenLogic.EndGame("RotateFigure", "Figuur draaien", $"{correctCells}/{CorrectGrid.transform.childCount}");
+        EndScreenLogic.SetGameViewCameraOptions(new((Width * 2 + 3) / 0.6f, Height / 0.54f), new(0.0f, 0.08f), Vector3.zero);
         DontDestroyOnLoad(GameGrid.transform.parent);
         SceneManager.LoadScene("EndScreen");
     }

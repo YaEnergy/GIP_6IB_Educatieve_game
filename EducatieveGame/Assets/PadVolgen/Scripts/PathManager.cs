@@ -40,16 +40,10 @@ public class PathManager : MonoBehaviour
     {
         //aanpassen camera grootte voor beeldverhouding
 
-        if (gameEnded)
-        {
-            //Hou hele grid in beeld met margin percentage voor eindscherm UI
-            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect(Grid.Width / 0.6f, Grid.Height / 0.54f, Camera.main.aspect);
-            Camera.main.transform.localPosition = new Vector3(Grid.Width * 0.7f - 0.5f, Grid.Height * 0.65f - 0.5f, -10.0f); //normalized anchor position
-        }
-        else
+        if (!gameEnded)
         {
             //Hou hele grid in beeld met margin percentage
-            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect(Grid.Width, (Grid.Height + 2) / 0.65f, Camera.main.aspect);
+            Camera.main.orthographicSize = CameraAspectRatioHelper.OrthographicSizeEnveloppeRect((Grid.Width + 2) / 0.8f, Grid.Height + 2, Camera.main.aspect);
             
             //Hou achtergrond (gras) in beeld
             if (Background != null)
@@ -73,23 +67,26 @@ public class PathManager : MonoBehaviour
 
     public void CancelGame()
     {
-        EndScreenLogic.EndGame("PadVolgenMenu", "Pad volgen", "Finish niet behaald", Camera.main.orthographicSize * 1.25f, Camera.main.transform.position, Camera.main.orthographicSize / 2.5f);
+        EndScreenLogic.EndGame("PadVolgenMenu", "Pad volgen", "Finish niet behaald");
         EndGame();
     }
 
     public void WinGame()
     {
-        EndScreenLogic.EndGame("PadVolgenMenu", "Pad volgen", CalculateScore().ToString() + "%", Camera.main.orthographicSize * 1.25f, Camera.main.transform.position, Camera.main.orthographicSize / 2.5f);
+        EndScreenLogic.EndGame("PadVolgenMenu", "Pad volgen", CalculateScore().ToString() + "%");
         EndGame();
     }
 
     private void EndGame()
     {
         Grid.DisableAllTiles();
-        
+
         GameObject gameview = GameObject.FindWithTag("GameView");
         gameview.transform.SetParent(null);
         gameview.transform.localScale = new(gameview.transform.localScale.x, gameview.transform.localScale.y, 1);
+
+        EndScreenLogic.SetGameViewCameraOptions(new((Grid.Width * 2) / 0.6f, Grid.Height / 0.54f), Vector2.zero, new Vector3(Grid.Width * 0.7f - 0.5f, Grid.Height * 0.65f - 0.5f, 0.0f));
+
         gameEnded = true;
         DontDestroyOnLoad(gameview);
         SceneManager.LoadScene("EndScreen");

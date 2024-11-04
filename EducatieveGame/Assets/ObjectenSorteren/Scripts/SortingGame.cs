@@ -253,7 +253,7 @@ public class SortingGame : MonoBehaviour
 
     public void EndGame() //einde spel --> naar eindscherm gaan
     {
-        EndScreenLogic.EndGame("KleurGameMenu", "Objecten sorteren", Score.ToString(), Camera.main.orthographicSize, Camera.main.transform.position, 0);
+        EndScreenLogic.EndGame("KleurGameMenu", "Objecten sorteren", Score.ToString());
         SceneManager.LoadScene("EndScreen");
     }
 
