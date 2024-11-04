@@ -102,12 +102,12 @@ public class PuzzleManager : MonoBehaviour
         //Update grid scale
         //Base puzzle size: 160x160
 
-        float basePuzzleSize = 160.0f;
+        const float BASE_PUZZLE_SIZE = 160.0f;
 
-        float gridScale = Mathf.Min(gridRect.rect.height / (basePuzzleSize * (rows + 1)), gridRect.rect.width / (basePuzzleSize * (columns + 1)));
+        float gridScale = Mathf.Min(gridRect.rect.height / (BASE_PUZZLE_SIZE * (rows + 1)), gridRect.rect.width / (BASE_PUZZLE_SIZE * (columns + 1)));
         
         grid.localScale = new(gridScale, gridScale, 1.0f);
-        puzzlePiecesViewGridLayout.cellSize = new(basePuzzleSize * gridScale, basePuzzleSize * gridScale);
+        puzzlePiecesViewGridLayout.cellSize = new(BASE_PUZZLE_SIZE * gridScale, BASE_PUZZLE_SIZE * gridScale);
     }
 
     public void CheckPuzzleToggle()
@@ -200,7 +200,11 @@ public class PuzzleManager : MonoBehaviour
         EndScreenLogic.EndGame("PuzzelGameMenu", "Coördinaten puzzel", $"{score}");
         GameObject preview = GameObject.FindWithTag("Preview");
         preview.transform.SetParent(null);
-        preview.transform.localScale = new(preview.transform.localScale.x * 0.75f, preview.transform.localScale.y * 0.75f, 1);
+        preview.transform.localScale = Vector3.one;
+
+        const float BASE_PUZZLE_SIZE = 160.0f;
+        EndScreenLogic.SetPreviewUIOptions(new(BASE_PUZZLE_SIZE * (columns + 2), BASE_PUZZLE_SIZE * (rows + 2)));
+
         DontDestroyOnLoad(preview);
         SceneManager.LoadScene("EndScreen");
     }

@@ -13,15 +13,20 @@ public class EndScreenLogic : MenuLogic
     [SerializeField] private TextMeshProUGUI _scoreText; //text met score
     [SerializeField] private TextMeshProUGUI _titleText; //text spelnaam
     [SerializeField] private Toggle[] _pathToggles;
+    private RectTransform previewRect;
+
+    private bool gameViewPresent = false; //Gameobject met GameView tag aanwezig
+    private GameObject gamePreview = null;
+
     private static string _currentGame = "MainMenu"; //huidig spel scenename
     private static string _gameName = "Eindscherm"; //huidig spel naam
     private static string _score = "0/0%"; //behaalde score
 
-    private bool gameViewPresent = false; //Gameobject met GameView tag aanwezig
-
     private static Vector2 _gameViewFitRectSize = Vector2.one; //grootte rechthoek waarin GameView past
     private static Vector2 _gameViewNormalizedCameraOffset = Vector2.zero; //camera gameview offset, waarbij (1, 1) = (ortho * aspect * 2, ortho)
     private static Vector3 _gameViewCameraOffset = Vector3.zero; //camera gameview offset in units
+
+    private static Vector2 _previewBaseRectSize = new(1000, 1000); //grootte rechthoek van Preview gameobject bij schaal 1
 
     private Transform Difficultys { get => _difficultys; set => _difficultys = value; }
     private Transform GameView { get => _gameView; set => _gameView = value; }
@@ -38,6 +43,8 @@ public class EndScreenLogic : MenuLogic
     private static Vector2 GameViewNormalizedCameraOffset { get => _gameViewNormalizedCameraOffset; set => _gameViewNormalizedCameraOffset = value; }
     private static Vector3 GameViewCameraOffset { get => _gameViewCameraOffset; set => _gameViewCameraOffset = value; }
 
+    private static Vector3 PreviewBaseRectSize { get => _previewBaseRectSize; set => _previewBaseRectSize = value; }
+
     private void Awake() //eindscherm instellen
     {
         AwakeBase();
@@ -52,19 +59,18 @@ public class EndScreenLogic : MenuLogic
         GameObject gameView = GameObject.FindWithTag("GameView");
         if (gameView != null)
         {
-            GameObject.FindWithTag("GameView").SetActive(true);
-            GameObject.FindWithTag("GameView").transform.parent = GameView;
+            gameView.SetActive(true);
+            gameView.transform.parent = GameView;
             gameViewPresent = true;
         }
 
-        GameObject preview = GameObject.FindWithTag("Preview");
-        if (preview != null)
+        previewRect = Preview.GetComponent<RectTransform>();
+        gamePreview = GameObject.FindWithTag("Preview");
+        if (gamePreview != null)
         {
-            GameObject.FindWithTag("Preview").SetActive(true);
-            GameObject.FindWithTag("Preview").transform.SetParent(Preview);
-
-            //FIX ME: Causes placement problems
-            //GameObject.FindWithTag("Preview").transform.position = new(Preview.transform.position.x, Preview.transform.position.y - OffsetY, Preview.transform.position.z);
+            gamePreview.SetActive(true);
+            gamePreview.transform.SetParent(Preview);
+            gamePreview.transform.position = new(Preview.transform.position.x, Preview.transform.position.y, Preview.transform.position.z);
         }
     
         if (CurrentGame.Equals("RotateFigure"))
@@ -162,6 +168,13 @@ public class EndScreenLogic : MenuLogic
                 GameViewCameraOffset.z - 10.0f
             );
         }
+
+        if (gamePreview != null)
+        {
+            float gridScale = Mathf.Min(previewRect.rect.width / PreviewBaseRectSize.x, previewRect.rect.height / PreviewBaseRectSize.y);
+
+            gamePreview.transform.localScale = new(gridScale, gridScale, 1.0f);
+        }
     }
 
     public void NewGame() //scene laden van laatst gespeelde spel
@@ -181,6 +194,11 @@ public class EndScreenLogic : MenuLogic
         GameViewFitRectSize = fitRectSize;
         GameViewNormalizedCameraOffset = normalizedCameraOffset;
         GameViewCameraOffset = offset;
+    }
+
+    public static void SetPreviewUIOptions(Vector2 baseRectSize)
+    {
+        PreviewBaseRectSize = baseRectSize;
     }
 
     public void ToggleShortestPath()
